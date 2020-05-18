@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class PatternSearch {
 
-	static void Naive(String pat, String txt, int nr) {
+	static void naive(String pat, String txt, int nr) {
 		int m = pat.length();
 		int n = txt.length();
 		int j;
@@ -56,6 +56,49 @@ public class PatternSearch {
 				t = (d * (t - txt.charAt(i) * h) + txt.charAt(i + m)) % q;
 				if (t < 0)
 					t = (t + q);
+			}
+		}
+	}
+
+	static void prefixFunction(String pat, int prefArray[]) { //wyliczanie tablicy prefiksów prefArray dla kmp()
+		int k = 0;
+		prefArray[0] = 0;
+		int m = pat.length();
+
+		for (int i = 1; i < m; i++) {
+			if (pat.charAt(i) == pat.charAt(k)) {
+				k++;
+				prefArray[i] = k;
+			} else {
+				if (k != 0) {
+					k = prefArray[k - 1];
+					i--;
+				} else
+					prefArray[i] = 0;
+			}
+		}
+	}
+
+	static void kmp(String pat, String txt, int nr) { //wyszukiwanie wzorca
+		int n = txt.length();
+		int m = pat.length();
+		int prefArray[] = new int[m];
+		prefixFunction(pat, prefArray);
+		int i = 0;
+		int j = 0;
+		while (i < n) {
+			if (txt.charAt(i) == pat.charAt(j)) {
+				i++;
+				j++;
+			}
+			if (j == m) {
+				System.out.println(String.format("KNUTH MORRIS PRATT wiersz: %d pozycja: %d", nr, i - j + 1));
+				j = prefArray[j - 1];
+			} else if (i < n && pat.charAt(j) != txt.charAt(i)) {
+				if (j != 0)
+					j = prefArray[j - 1];
+				else
+					i++;
 			}
 		}
 	}
@@ -109,8 +152,9 @@ public class PatternSearch {
 				currentString = tekst.substring(startOfLine, startOfLine + lineLength + wzorzecLength - 1).replace("\n", "");
 				startOfLine = i + 1;
 				// start
-				Naive(wzorzec, currentString, lineNumber);
+				//Naive(wzorzec, currentString, lineNumber);
 				rabinKarp(wzorzec, currentString, 27077, lineNumber);
+				kmp(wzorzec, currentString, lineNumber);
 				// stop
 				// potem suma tych czasow
 				lineNumber++;
