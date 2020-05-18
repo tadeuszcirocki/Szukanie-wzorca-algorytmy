@@ -145,6 +145,11 @@ public class PatternSearch {
 		String currentString = ""; //wycinek z tekstu podawany do funkcji
 		int lineLength = 0; //d³ugoœæ wiersza
 		wzorzec = wzorzec.replace("\n", ""); //wzorzec bez znaków nowej linii
+
+		long naiveTime = 0;
+		long rabinTime = 0;
+		long kmpTime = 0;
+		long startTime;
 		for (int i = 0; i < tekst.length() - wzorzecLength - 1; i++) {
 			if (tekst.charAt(i) == '\n') {
 				lineLength = i - startOfLine; // wzorzec mo¿e wystêpowaæ w danym wierszu w zakresie od wiersz + nastepne (dlugosc wzorca-1) znakow ->
@@ -152,15 +157,25 @@ public class PatternSearch {
 				currentString = tekst.substring(startOfLine, startOfLine + lineLength + wzorzecLength - 1).replace("\n", "");
 				startOfLine = i + 1;
 				// start
-				//Naive(wzorzec, currentString, lineNumber);
+				startTime = System.nanoTime();
+				naive(wzorzec, currentString, lineNumber);
+				naiveTime += System.nanoTime() - startTime;
+
+				startTime = System.nanoTime();
 				rabinKarp(wzorzec, currentString, 27077, lineNumber);
+				rabinTime += System.nanoTime() - startTime;
+
+				startTime = System.nanoTime();
 				kmp(wzorzec, currentString, lineNumber);
-				// stop
-				// potem suma tych czasow
+				kmpTime += System.nanoTime() - startTime;
+
 				lineNumber++;
 			}
 
 		}
+		System.out.println("NAIWNY: " + naiveTime / 1000000000.0 + "s");
+		System.out.println("RABIN: " + rabinTime / 1000000000.0 + "s");
+		System.out.println("KMP: " + kmpTime / 1000000000.0 + "s");
 
 	}
 
